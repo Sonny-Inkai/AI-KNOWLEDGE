@@ -37,3 +37,107 @@ The **normalized Laplacian** is crucial in graph-based learning and network anal
 - It also provides spectral properties that are valuable in various graph-related tasks and helps prevent issues like over-smoothing in deeper models.
 
 Overall, the normalized Laplacian enhances the ability of machine learning models to effectively process and learn from graph data, making it a fundamental tool in graph-based methods.
+
+
+## Indices Matrix
+Yes, the `indices` tensor in a sparse matrix can be computed based on the structure of the data you're working with. Typically, the `indices` represent the positions where connections or relationships exist between elements (e.g., nodes in a graph). Here’s how you can calculate these indices:
+
+### 1. **Understanding the Adjacency Matrix**
+
+If you have an adjacency matrix (which represents the connections in a graph), the `indices` correspond to the row and column positions of the non-zero elements in this matrix.
+
+### 2. **Basic Formula for Indices**
+
+Given an adjacency matrix `A`:
+
+- **For each edge or connection between node `i` and node `j`:**
+  - Row index: `i` (the node where the connection starts).
+  - Column index: `j` (the node where the connection ends).
+
+### 3. **Example with a Small Graph**
+
+Suppose you have a simple graph with 3 nodes and the following adjacency matrix:
+
+```python
+A = [
+    [0, 1, 1],
+    [1, 0, 0],
+    [1, 0, 0]
+]
+```
+
+This adjacency matrix `A` represents a graph where:
+- Node 0 is connected to Node 1 and Node 2.
+- Node 1 is connected to Node 0.
+- Node 2 is connected to Node 0.
+
+### Steps to Compute Indices:
+
+1. **Identify the Non-Zero Elements:**
+   - In `A`, the non-zero elements indicate the existence of an edge.
+
+2. **Record the Row and Column Indices:**
+   - For every non-zero element, note down the row and column index.
+
+### Calculation:
+
+Using the example adjacency matrix `A`:
+
+```python
+import torch
+
+# Initialize the list for indices
+row_indices = []
+col_indices = []
+
+# Iterate over the matrix
+for i in range(len(A)):
+    for j in range(len(A[i])):
+        if A[i][j] != 0:  # Check if the element is non-zero
+            row_indices.append(i)
+            col_indices.append(j)
+
+# Convert to tensor format for PyTorch
+indices = torch.tensor([row_indices, col_indices])
+
+# Print the calculated indices
+print(indices)
+```
+
+### Output:
+
+The calculated `indices` tensor will be:
+
+```
+tensor([[0, 0, 1, 2],
+        [1, 2, 0, 0]])
+```
+
+This corresponds to the following non-zero elements in the adjacency matrix:
+- `(0, 1)`: Node 0 is connected to Node 1.
+- `(0, 2)`: Node 0 is connected to Node 2.
+- `(1, 0)`: Node 1 is connected to Node 0.
+- `(2, 0)`: Node 2 is connected to Node 0.
+
+### 4. **General Formula**
+
+For a given adjacency matrix `A` with `n` rows and `m` columns, the formula to calculate the `indices` tensor is:
+
+```python
+indices = torch.tensor([
+    [i for i in range(n) for j in range(m) if A[i][j] != 0],  # Row indices
+    [j for i in range(n) for j in range(m) if A[i][j] != 0]   # Column indices
+])
+```
+
+### 5. **Advanced Cases:**
+
+In more complex scenarios, like when dealing with weighted graphs or more sophisticated data structures, the process is similar, but you might include additional logic to account for weights or other attributes.
+
+### Summary
+
+- **Adjacency Matrix**: Start with your adjacency matrix or data structure representing connections.
+- **Non-Zero Elements**: Identify the positions of non-zero elements.
+- **Indices**: Use the positions of these non-zero elements to construct the `indices` tensor.
+
+This approach provides a systematic way to derive the `indices` tensor for sparse matrices used in graph-based computations.
